@@ -4,11 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIC API Test 2</title>
-    <style>
-        #image-container {
-            max-height: 300px;
-        }
-        
+    <style>        
         body {
             margin: 0;
             padding: 0;
@@ -18,13 +14,25 @@
         canvas {
             display: block;
         }
+
+        #image-container {
+            max-height: 300px;
+        }
+
+        #artwork-container {
+            display: none;
+        }
     </style>
     <script src="https://unpkg.com/textmode.js@latest/dist/textmode.umd.js"></script>
 </head>
 <body>
-    <img id="image-container"/>
-    <ul id="artworks-list"></ul>
+    <div id="artwork-container">
+        <img id="image-container"/>
+        <ul id="artwork-text"></ul>
+    </div>
     <button id="next-btn">Next Image</button>
+    <button id="color-btn">Color Mode</button>
+    <button id="reveal-btn">Reveal</button>
     <button id="start-btn">Start</button>
     <script src="script.js"></script>
 </body>

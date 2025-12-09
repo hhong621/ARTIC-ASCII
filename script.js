@@ -4,6 +4,10 @@ const CACHE_KEY = 'aicArtworksCache';
 // Cache expiration time in milliseconds (1 hour = 60 * 60 * 1000)
 const CACHE_DURATION = 60 * 60 * 1000;
 let currentIndex = 0;
+let isRevealed = false;
+const artworkContanier = document.getElementById('artwork-container');
+const artworkText = document.getElementById('artwork-text');
+const imageContainer = document.getElementById('image-container');
 
 async function getPageTotal() {
     // Get the total number of artworks (using limit=0)
@@ -124,10 +128,7 @@ async function getImageUrl() {
  * Display the data and image of the current artwork
  */
 async function renderArtworkData() {
-    const artworksList = document.getElementById('artworks-list');
-    const imageContainer = document.getElementById('image-container');
-
-    artworksList.innerHTML = '';
+    artworkText.innerHTML = '';
 
     const artworkData = await fetchArtworksAndCache();
 
@@ -141,7 +142,7 @@ async function renderArtworkData() {
                 <span>(${artwork.date_display || 'N/A'})</span>
             </div>
         `;
-        artworksList.appendChild(li);
+        artworkText.appendChild(li);
 
         let tempImageUrl = await getImageUrl();
     
@@ -168,9 +169,9 @@ async function renderArtworkData() {
             });
     } else if (!artworkData) {
         // Error case already handled in fetchArtworksAndCache, but good for cleanup
-        artworksList.innerHTML = '<li>Could not retrieve artwork data due to an error. Check console for details.</li>';
+        artworkText.innerHTML = '<li>Could not retrieve artwork data due to an error. Check console for details.</li>';
     } else {
-        artworksList.innerHTML = '<li>No artworks were found with the current query.</li>';
+        artworkText.innerHTML = '<li>No artworks were found with the current query.</li>';
     }
 }
 
@@ -225,12 +226,12 @@ t.mouseMoved((data) => {
     
     lastMouse = { x: cx, y: cy };
 });
-*/
+
 t.mouseClicked((data) => {
     charColorFixed = !charColorFixed;
     console.log(`Clicked at grid position: ${data.position.x}, ${data.position.y}`);
     renderImage(imageUrl, characters, getCharColorMode(), "fixed");
-});
+});*/
 
 // Handle WebGL context loss and restoration
 t.canvas.addEventListener("webglcontextlost", handleContextLost, false);
@@ -277,6 +278,16 @@ function getCharColorMode() {
     return charColorFixed ? "fixed" : "sampled";
 }
 
+function setIsRevealed(revealed) {
+    isRevealed = revealed;
+
+    if (revealed) {
+        artworkContanier.style.display = "block";
+    } else {
+        artworkContanier.style.display = "none";
+    }
+}
+
 document.getElementById('next-btn').addEventListener('click', async () => {
     const artworkData = await fetchArtworksAndCache();
     if (currentIndex < (artworkData.length - 1)) {
@@ -284,9 +295,19 @@ document.getElementById('next-btn').addEventListener('click', async () => {
     } else {
         currentIndex = 0;
     }
+    setIsRevealed(false);
     renderArtworkData();
 });
 
 document.getElementById('start-btn').addEventListener('click', async () => {
     renderImage(imageUrl, characters, getCharColorMode(), "fixed");
+});
+
+document.getElementById('color-btn').addEventListener('click', async () => {
+    charColorFixed = !charColorFixed;
+    renderImage(imageUrl, characters, getCharColorMode(), "fixed");
+});
+
+document.getElementById('reveal-btn').addEventListener('click', async () => {
+    setIsRevealed(true);
 });
