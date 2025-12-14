@@ -6,8 +6,8 @@ const CACHE_DURATION = 60 * 60 * 1000;
 let currentIndex = 0;
 let isRevealed = false;
 const artworkContanier = document.getElementById('artwork-container');
-const artworkText = document.getElementById('artwork-text');
 const imageContainer = document.getElementById('image-container');
+const canvas = document.getElementById('textmode-canvas');
 
 async function getPageTotal() {
     // Get the total number of artworks (using limit=0)
@@ -106,11 +106,12 @@ async function fetchArtworksAndCache() {
 }
 
 // --- Implementation and Rendering ---
-const t = textmode.create({ width: 600, height: 600 });
+// , { width: 600, height: 600 }
+const t = textmode.create({canvas, width: 600, height: 600});
 
 let myImage;
 let characters = " .:-=+*#%@";
-let charColorFixed = true;
+let charColorFixed = false;
 const trail = [];
 let lastMouse = null;
 let imageUrl;
@@ -128,21 +129,17 @@ async function getImageUrl() {
  * Display the data and image of the current artwork
  */
 async function renderArtworkData() {
-    artworkText.innerHTML = '';
 
     const artworkData = await fetchArtworksAndCache();
 
     if (artworkData && artworkData.length > 0) {
         const artwork = artworkData[currentIndex];
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <div>${artwork.title}</div>
-            <div>
-                Artist: ${artwork.artist_display || 'N/A'}
-                <span>(${artwork.date_display || 'N/A'})</span>
-            </div>
-        `;
-        artworkText.appendChild(li);
+        const title = document.getElementById("artwork-title");
+        const artist = document.getElementById("artwork-artist");
+        const date = document.getElementById("artwork-date");
+        title.innerHTML = artwork.title;
+        artist.innerHTML = artwork.artist_display || 'N/A';
+        date.innerHTML = artwork.date_display || 'N/A';
 
         let tempImageUrl = await getImageUrl();
     
@@ -169,9 +166,9 @@ async function renderArtworkData() {
             });
     } else if (!artworkData) {
         // Error case already handled in fetchArtworksAndCache, but good for cleanup
-        artworkText.innerHTML = '<li>Could not retrieve artwork data due to an error. Check console for details.</li>';
+        title.innerHTML = "Could not retrieve artwork data due to an error. Check console for details.";
     } else {
-        artworkText.innerHTML = '<li>No artworks were found with the current query.</li>';
+        title.innerHTML = "No artworks were found with the current query.";
     }
 }
 
