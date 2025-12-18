@@ -106,7 +106,6 @@ async function fetchArtworksAndCache() {
 }
 
 // --- Implementation and Rendering ---
-// , { width: 600, height: 600 }
 const t = textmode.create({canvas, width: 600, height: 600});
 
 let myImage;
@@ -294,10 +293,6 @@ document.getElementById('next-btn').addEventListener('click', async () => {
     }
     setIsRevealed(false);
     renderArtworkData();
-});
-
-document.getElementById('start-btn').addEventListener('click', async () => {
-    renderImage(imageUrl, characters, getCharColorMode(), "fixed");
 });
 
 document.getElementById('color-btn').addEventListener('click', async () => {

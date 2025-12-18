@@ -39,12 +39,16 @@ body {
 #col-canvas {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
     gap: 1rem;
     height: 100vh;
     min-width: 680px;
     background-color: #000000;
+}
+
+canvas {
+    padding-top: 16px;
 }
 
 #intro {
@@ -70,6 +74,11 @@ h1 {
     font-size: 2rem;
     font-weight: 700;
     font-family: "JetBrains Mono", monospace;
+}
+
+.btn-container {
+    position: absolute;
+    bottom: 24px;
 }
 
 button {

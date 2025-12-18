@@ -13,7 +13,7 @@
 <body>
     <div id="col-artwork">
         <div id="intro">
-            <a href="https://hhong621.github.io/work/" target="_blank" style="color: #F2F23C; text-decoration: none;">Harrison Hong</a>
+            <a href="https://hhong621.github.io/work/" target="_blank" style="color: #18D97B; text-decoration: none; font-family: 'JetBrains Mono', monospace;">Harrison Hong</a>
             <h1>ASCII Art Museum</h1>
             <p>This project combines my love for art museums and ASCII art. Artworks come in a small batch and update every hour. Enjoy!
                 <br><br>Images are from <a href="https://api.artic.edu/docs/#introduction" target="_blank">The Art Institute of Chicago API</a>. ASCII library is from <a href="https://code.textmode.art/" target="_blank">textmode.js</a>.</p>
@@ -39,12 +39,14 @@
     <div id="col-canvas">
         <canvas id="textmode-canvas"></canvas>
         <div class="btn-container">
-            <button id="next-btn">Next Artwork</button>
             <button id="color-btn">Toggle Color Mode</button>
+            <button id="next-btn">Next Artwork</button>
             <button id="reveal-btn">Reveal</button>
-            <button id="start-btn">Start</button>
         </div>
     </div>
     <script src="script.js"></script>
+    <script>
+        setTimeout(function(){renderImage(imageUrl, characters, getCharColorMode(), "fixed")}, 1000);
+    </script>
 </body>
 </html>
