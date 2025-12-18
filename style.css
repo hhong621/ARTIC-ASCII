@@ -39,7 +39,7 @@ body {
 #col-canvas {
     display: flex;
     flex-direction: column;
-    justify-content: start;
+    justify-content: center;
     align-items: center;
     gap: 2rem;
     height: 100vh;
@@ -48,7 +48,7 @@ body {
 }
 
 canvas {
-    padding-top: 2rem;
+    padding-bottom: 2rem;
 }
 
 #intro {
@@ -72,8 +72,8 @@ h1, p {
 
 h1 {
     font-size: 2rem;
-    font-weight: 700;
-    font-family: "JetBrains Mono", monospace;
+    font-weight: 400;
+
 }
 
 .btn-container {
