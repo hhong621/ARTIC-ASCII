@@ -79,6 +79,8 @@ h1 {
 .btn-container {
     position: absolute;
     bottom: 1.5rem;
+    display: flex;
+    gap: 1.5rem;
 }
 
 button {
@@ -112,12 +114,13 @@ button:active {
 }
 
 #artwork-container {
-    display: none;
+    position: relative;
 }
 
 #artwork-text {
     margin-bottom: 2rem;
     border-top: 1px solid #606060;
+    opacity: 0;
 }
 
 .text-row {
@@ -134,14 +137,47 @@ button:active {
 }
 
 #image-container {
+    position: absolute;
+    top: 0;
+    transition: cubic-bezier(0.78, 0, 0.22, 1) 300ms;
+    padding-bottom: 2rem;
+}
+
+#image-wrapper {
+    position: relative;
     width: 100%;
+}
+
+#image {
+    width: 100%;
+}
+
+#overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(rgb(0, 0, 0, 0.5), transparent), url(https://grainy-gradients.vercel.app/noise.svg);
+    backdrop-filter: blur(24px);
+    color: white;
+    font-family: "JetBrains Mono", monospace;
+    text-align: center;
+    cursor: pointer;
+    transition: ease-out 100ms;
+}
+
+#overlay:hover {
+    backdrop-filter: blur(16px);
 }
 
 @media (max-width: 1024px) {
     body {
         display: flex;
         flex-direction: column;
-        height: fit-content;
     }
     
     #col-artwork {
@@ -149,9 +185,13 @@ button:active {
         padding: 2rem;
     }
 
-    #image-container {
-        max-height: 300px;
+    #image-wrapper {
         object-fit: contain;
+    }
+
+    #image {
+        width: 100%;
+        height: auto;
     }
 
     #col-canvas {
@@ -164,7 +204,13 @@ button:active {
         width: 100vw;
     }
 
+    canvas {
+        padding-bottom: 0;
+    }
+
     .btn-container {
         position: inherit;
+        gap: 1rem;
+        padding-bottom: 2rem;
     }
 }

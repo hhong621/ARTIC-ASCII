@@ -5,9 +5,11 @@ const CACHE_KEY = 'aicArtworksCache';
 const CACHE_DURATION = 60 * 60 * 1000;
 let currentIndex = 0;
 let isRevealed = false;
-const artworkContanier = document.getElementById('artwork-container');
-const imageContainer = document.getElementById('image-container');
+const artworkText = document.getElementById('artwork-text');
+const artworkImage = document.getElementById('image');
 const canvas = document.getElementById('textmode-canvas');
+const overlay = document.getElementById('overlay');
+const imageContainer = document.getElementById('image-container');
 
 async function getPageTotal() {
     // Get the total number of artworks (using limit=0)
@@ -155,7 +157,7 @@ async function renderArtworkData() {
                     throw new Error(`Error fetching image: ${response.statusText}`);
                 } else {
                     imageUrl = tempImageUrl;
-                    imageContainer.src = tempImageUrl;
+                    artworkImage.src = tempImageUrl;
                     renderImage(tempImageUrl, characters, getCharColorMode(), "fixed");
                 }
             })
@@ -174,60 +176,6 @@ async function renderArtworkData() {
 t.setup(() => {
     renderArtworkData(); // initial call
 });
-
-/*
-t.draw(async () => {
-    t.background(0);
-    await renderImage(imageUrl, characters, getCharColorMode(), "fixed");
-    
-    for (let i = trail.length - 1; i >= 0; i--) {
-        const p = trail[i];
-        p.age++;
-        
-        if (p.age >= p.maxAge) {
-            trail.splice(i, 1);
-            continue;
-        }
-        
-        const life = 1 - (p.age / p.maxAge);
-        const brightness = Math.round(255 * life);
-        const chars = ["0", "1", "0", "1"];
-        const idx = Math.floor(life * chars.length);
-        
-        t.push();
-        t.charColor(brightness, brightness, brightness);
-        t.translate(p.x, p.y);
-        t.char(chars[Math.min(idx, chars.length - 1)]);
-        t.point();
-        t.pop();
-    }
-});
-/*
-t.mouseMoved((data) => {
-    if (data.position.x === -1 || data.position.y === -1) return;
-    
-    // Convert to center-based coords
-    const cx = Math.round(data.position.x - (t.grid.cols - 1) / 2);
-    const cy = Math.round(data.position.y - (t.grid.rows - 1) / 2);
-    
-    // Spawn multiple particles based on movement speed
-    const dx = lastMouse ? cx - lastMouse.x : 0;
-    const dy = lastMouse ? cy - lastMouse.y : 0;
-    const speed = Math.sqrt(dx * dx + dy * dy);
-    const count = Math.max(1, Math.ceil(speed * 1.5));
-    
-    for (let i = 0; i < count; i++) {
-        trail.push({ x: cx, y: cy, age: 0, maxAge: 15 + Math.random() * 10 });
-    }
-    
-    lastMouse = { x: cx, y: cy };
-});
-
-t.mouseClicked((data) => {
-    charColorFixed = !charColorFixed;
-    console.log(`Clicked at grid position: ${data.position.x}, ${data.position.y}`);
-    renderImage(imageUrl, characters, getCharColorMode(), "fixed");
-});*/
 
 // Handle WebGL context loss and restoration
 t.canvas.addEventListener("webglcontextlost", handleContextLost, false);
@@ -276,11 +224,13 @@ function getCharColorMode() {
 
 function setIsRevealed(revealed) {
     isRevealed = revealed;
-
+    console.log(artworkText.offsetHeight)
     if (revealed) {
-        artworkContanier.style.display = "block";
+        imageContainer.style.top = (artworkText.offsetHeight + 32) + "px";
+        artworkText.style.opacity = 1;
     } else {
-        artworkContanier.style.display = "none";
+        imageContainer.style.top = 0;
+        artworkText.style.opacity = 0;
     }
 }
 
@@ -292,6 +242,7 @@ document.getElementById('next-btn').addEventListener('click', async () => {
         currentIndex = 0;
     }
     setIsRevealed(false);
+    overlay.style.display = "flex";
     renderArtworkData();
 });
 
@@ -300,6 +251,7 @@ document.getElementById('color-btn').addEventListener('click', async () => {
     renderImage(imageUrl, characters, getCharColorMode(), "fixed");
 });
 
-document.getElementById('reveal-btn').addEventListener('click', async () => {
+overlay.addEventListener('click', async () => {
     setIsRevealed(true);
+    overlay.style.display = "none";
 });
