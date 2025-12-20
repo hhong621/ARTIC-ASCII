@@ -1,8 +1,7 @@
 // --- Configuration ---
 const ARTWORKS_URL = "https://api.artic.edu/api/v1/artworks";
 const CACHE_KEY = 'aicArtworksCache';
-// Cache expiration time in milliseconds (1 hour = 60 * 60 * 1000)
-const CACHE_DURATION = 60 * 60 * 1000;
+const CACHE_DURATION = 60 * 60 * 1000; // Cache expiration time in milliseconds (1 hour = 60 * 60 * 1000)
 let currentIndex = 0;
 let isRevealed = false;
 const artworkText = document.getElementById('artwork-text');
@@ -11,6 +10,10 @@ const canvas = document.getElementById('textmode-canvas');
 const overlay = document.getElementById('overlay');
 const imageContainer = document.getElementById('image-container');
 
+/**
+ * Use limit = 0 to get the total number of artworks from the API
+ * @returns number of total pages
+ */
 async function getPageTotal() {
     // Get the total number of artworks (using limit=0)
     try {
@@ -25,7 +28,6 @@ async function getPageTotal() {
             console.error("Error: Total artwork count is zero.");
             return null;
         } else {
-            //console.log(`Total artworks available: ${totalArtworks}`);
             return totalArtworks;
         }
     } catch (error) {
@@ -34,6 +36,10 @@ async function getPageTotal() {
     }
 }
 
+/**
+ * Use the getPageTotal() function to generate random IDs
+ * @returns array of random artwork IDs
+ */
 async function getRandomIDs() {
     let idArr = [];
     const response = await getPageTotal();
@@ -113,10 +119,12 @@ const t = textmode.create({canvas, width: 600, height: 600});
 let myImage;
 let characters = " .:-=+*#%@";
 let charColorFixed = false;
-const trail = [];
-let lastMouse = null;
 let imageUrl;
 
+/**
+ * Construct imageUrl using artwork image ID
+ * @returns imageUrl string
+ */
 async function getImageUrl() {
     const artworkData = await fetchArtworksAndCache();
     if (artworkData && artworkData.length > 0) {
@@ -144,6 +152,7 @@ async function renderArtworkData() {
 
         let tempImageUrl = await getImageUrl();
     
+        // Fetch image using url
         fetch(tempImageUrl)
             .then(response => {
                 if (!response.ok) {
@@ -181,6 +190,10 @@ t.setup(() => {
 t.canvas.addEventListener("webglcontextlost", handleContextLost, false);
 t.canvas.addEventListener("webglcontextrestored", handleContextRestored, false);
 
+/**
+ * Stop rendering if WebGL context is lost
+ * @param event
+ */
 function handleContextLost(event) {
     // Prevent the default handling to allow context restoration
     event.preventDefault();
@@ -188,11 +201,21 @@ function handleContextLost(event) {
     t.noLoop();
 }
 
-function handleContextRestored(event) {
+/**
+ * Reload window when context is restored
+ */
+function handleContextRestored() {
     window.location.reload();
     console.log("WebGL context restored - resuming render loop");
 }
 
+/**
+ * Render the ASCII filtered image on a textmode canvas
+ * @param imageUrl url string for image
+ * @param characters string of characters for ascii mapping
+ * @param charColorMode "fixed" for all white | "sampled" for image colors
+ * @param cellColorMode "fixed" for solid color
+ */
 async function renderImage(imageUrl, characters, charColorMode, cellColorMode) {  
     myImage = await t.loadImage(imageUrl);
     // Image is now ready to use
@@ -218,13 +241,20 @@ async function renderImage(imageUrl, characters, charColorMode, cellColorMode) {
     t.image(myImage);
 }
 
+/**
+ * Get char color mode based on if charColorFixed is true or false
+ * @returns string for char color mode
+ */
 function getCharColorMode() {
     return charColorFixed ? "fixed" : "sampled";
 }
 
+/**
+ * Set CSS for imageContainer and artworkText 
+ * @param revealed boolean for if artwork data is revealed
+ */
 function setIsRevealed(revealed) {
     isRevealed = revealed;
-    console.log(artworkText.offsetHeight)
     if (revealed) {
         imageContainer.style.top = (artworkText.offsetHeight + 32) + "px";
         artworkText.style.opacity = 1;
@@ -234,6 +264,7 @@ function setIsRevealed(revealed) {
     }
 }
 
+// Next button onClick listener, advance index and reset revealed state
 document.getElementById('next-btn').addEventListener('click', async () => {
     const artworkData = await fetchArtworksAndCache();
     if (currentIndex < (artworkData.length - 1)) {
@@ -246,11 +277,13 @@ document.getElementById('next-btn').addEventListener('click', async () => {
     renderArtworkData();
 });
 
+// Toggle color mode button onClick listener, rerender image with new color mode
 document.getElementById('color-btn').addEventListener('click', async () => {
     charColorFixed = !charColorFixed;
     renderImage(imageUrl, characters, getCharColorMode(), "fixed");
 });
 
+// Overlay onClick listener, update revealed state to true
 overlay.addEventListener('click', async () => {
     setIsRevealed(true);
     overlay.style.display = "none";
