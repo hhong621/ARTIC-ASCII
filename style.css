@@ -171,7 +171,7 @@ button:active {
 }
 
 #overlay:hover {
-    backdrop-filter: blur(16px);
+    backdrop-filter: blur(12px);
 }
 
 @media (max-width: 1024px) {
