@@ -9,6 +9,8 @@ const artworkImage = document.getElementById('image');
 const canvas = document.getElementById('textmode-canvas');
 const overlay = document.getElementById('overlay');
 const imageContainer = document.getElementById('image-container');
+const artworkContainer = document.getElementById('artwork-container');
+const revealButton = document.getElementById('reveal-btn');
 
 /**
  * Use limit = 0 to get the total number of artworks from the API
@@ -287,4 +289,29 @@ document.getElementById('color-btn').addEventListener('click', async () => {
 overlay.addEventListener('click', async () => {
     setIsRevealed(true);
     overlay.style.display = "none";
+});
+
+// Mobile event listeners
+
+// Reveal button onClick listener, opens artwork sheet
+revealButton.addEventListener('click', async () => {
+    artworkContainer.style.display = "block";
+    document.body.classList.add("modal-open");
+});
+
+// Sheet scrim onClick listener, closes sheet
+artworkContainer.addEventListener('click', async () => {
+    artworkContainer.style.display = "none";
+    document.body.classList.remove("modal-open");
+});
+
+// Close button onClick listener, closes sheet
+document.getElementById('sheet-close').addEventListener('click', async () => {
+    artworkContainer.style.display = "none";
+    document.body.classList.remove("modal-open");
+});
+
+// Sheet surface onClick listener, prevents surface clicks from closing sheet
+document.getElementById('artwork-wrapper').addEventListener('click', async (event) => {
+    event.stopPropagation();
 });
