@@ -48,16 +48,11 @@
         </div>
     </div>
     <div id="col-canvas">
-        <canvas id="textmode-canvas"></canvas>
-        <div class="btn-container">
-            <button id="color-btn">Toggle Color Mode</button>
-            <button id="reveal-btn">Show Artwork</button>
-            <button id="next-btn">Next Artwork</button>
+        <div id="col-canvas-body">
+            <canvas id="textmode-canvas"></canvas>
+            <div id="controls"></div>
         </div>
     </div>
-    <script src="script.js"></script>
-    <script>
-        setTimeout(function(){renderImage(imageUrl, characters, getCharColorMode(), "fixed")}, 1500);
-    </script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>

@@ -10,7 +10,7 @@ const canvas = document.getElementById('textmode-canvas');
 const overlay = document.getElementById('overlay');
 const imageContainer = document.getElementById('image-container');
 const artworkContainer = document.getElementById('artwork-container');
-const revealButton = document.getElementById('reveal-btn');
+const controls = document.getElementById('controls');
 
 /**
  * Use limit = 0 to get the total number of artworks from the API
@@ -120,7 +120,6 @@ const t = textmode.create({canvas, width: 600, height: 600});
 
 let myImage;
 let characters = " .:-=+*#%@";
-let charColorFixed = false;
 let imageUrl;
 
 /**
@@ -169,7 +168,7 @@ async function renderArtworkData() {
                 } else {
                     imageUrl = tempImageUrl;
                     artworkImage.src = tempImageUrl;
-                    renderImage(tempImageUrl, characters, getCharColorMode(), "fixed");
+                    renderImage(imageUrl, characters, PARAMS.charColorMode, PARAMS.cellColorMode, PARAMS.charColor, PARAMS.cellColor);
                 }
             })
             .catch(error => {
@@ -215,10 +214,12 @@ function handleContextRestored() {
  * Render the ASCII filtered image on a textmode canvas
  * @param imageUrl url string for image
  * @param characters string of characters for ascii mapping
- * @param charColorMode "fixed" for all white | "sampled" for image colors
- * @param cellColorMode "fixed" for solid color
+ * @param charColorMode "fixed" for solid color | "sampled" for image colors
+ * @param cellColorMode "fixed" for solid color | "sampled" for image colors
+ * @param charColorVal string for char hex color value, white by default
+ * @param cellColorVal string for cell hex color value, black by default
  */
-async function renderImage(imageUrl, characters, charColorMode, cellColorMode) {  
+async function renderImage(imageUrl, characters, charColorMode, cellColorMode, charColorVal = "ffffff", cellColorVal = "000000") {  
     myImage = await t.loadImage(imageUrl);
     // Image is now ready to use
 
@@ -233,10 +234,10 @@ async function renderImage(imageUrl, characters, charColorMode, cellColorMode) {
     myImage.cellColorMode(cellColorMode);
 
      // Set fixed character color (when charColorMode is "fixed")
-    myImage.charColor(255, 255, 255);
+    myImage.charColor(charColorVal);
     
     // Set fixed cell background color (when cellColorMode is "fixed")
-    myImage.cellColor(0, 0, 0);
+    myImage.cellColor(cellColorVal);
 
     // Draw image at full grid size
     t.resizeCanvas(600, 600);
@@ -244,12 +245,150 @@ async function renderImage(imageUrl, characters, charColorMode, cellColorMode) {
 }
 
 /**
- * Get char color mode based on if charColorFixed is true or false
- * @returns string for char color mode
+ * Tweakpane implementation
  */
-function getCharColorMode() {
-    return charColorFixed ? "fixed" : "sampled";
+
+import {Pane} from 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.4/+esm';
+
+// Setup pane and params
+const pane = new Pane({
+    container: controls,
+});
+
+const PARAMS = {
+    charColor: '#ffffff',
+    cellColor: '#000000',
+    charColorMode: "sampled",
+    cellColorMode: "fixed",
+};
+
+// Setup folders and bindings
+const settingsFolder = pane.addFolder({
+    title: 'Settings',
+    expanded: true,
+});
+
+const actionsFolder = pane.addFolder({
+    title: 'Actions',
+    expanded: true,
+});
+
+const charColorModeBinding = settingsFolder.addBinding(PARAMS, 'charColorMode', {
+    view: 'list',
+    label: 'Char Color Mode',
+    options: [
+        {text: 'Sampled', value: 'sampled'},
+        {text: 'Fixed', value: 'fixed'},
+    ],
+    value: 'sampled',
+});
+
+const charColorBinding = settingsFolder.addBinding(PARAMS, 'charColor', {
+    label: 'Char Color',
+});
+
+const cellColorModeBinding = settingsFolder.addBinding(PARAMS, 'cellColorMode', {
+    view: 'list',
+    label: 'Cell Color Mode',
+    options: [
+        {text: 'Sampled', value: 'sampled'},
+        {text: 'Fixed', value: 'fixed'},
+    ],
+    value: 'fixed',
+});
+
+const cellColorBinding = settingsFolder.addBinding(PARAMS, 'cellColor', {
+    label: 'Cell Color',
+});
+
+// Event listener for charColorMode, charColorBinding input is hidden when set to "sampled"
+charColorModeBinding.on('change', (event) => {
+    const isHidden = event.value === 'sampled';
+    charColorBinding.hidden = isHidden;
+    PARAMS.charColorMode = event.value;
+    renderImage(imageUrl, characters, PARAMS.charColorMode, PARAMS.cellColorMode, PARAMS.charColor, PARAMS.cellColor);
+});
+
+// Initial state for charColorBinding input
+charColorBinding.hidden = true;
+
+// Event listener for charColorBinding
+charColorBinding.on('change', (event) => {
+    renderImage(imageUrl, characters, PARAMS.charColorMode, PARAMS.cellColorMode, PARAMS.charColor, PARAMS.cellColor);
+});
+
+// Event listener for cellColorMode, cellColorBinding input is hidden when set to "sampled"
+cellColorModeBinding.on('change', (event) => {
+    const isHidden = event.value === 'sampled';
+    cellColorBinding.hidden = isHidden;
+    PARAMS.cellColorMode = event.value;
+    renderImage(imageUrl, characters, PARAMS.charColorMode, PARAMS.cellColorMode, PARAMS.charColor, PARAMS.cellColor);
+});
+
+// Event listener for cellColorBinding
+cellColorBinding.on('change', (event) => {
+    renderImage(imageUrl, characters, PARAMS.charColorMode, PARAMS.cellColorMode, PARAMS.charColor, PARAMS.cellColor);
+})
+
+// Setup show artwork button (mobile only)
+const showArtworkBtn = actionsFolder.addButton({
+    title: 'View Artwork Info',
+});
+
+// Match media check
+const mobileScreenMatch = window.matchMedia('(max-width: 1024px)');
+ 
+mobileScreenMatch.addEventListener('change', screenCheck); // Onchange listener
+screenCheck(); // Initial call
+
+/**
+ * Checks screen size to update show artwork button visibility
+ */
+function screenCheck() {
+    if (mobileScreenMatch.matches) {
+        showArtworkBtn.hidden = false;
+    }
+    else {
+        showArtworkBtn.hidden = true;
+    }
 }
+
+// Event listener for show artwork button click, opens sheet
+showArtworkBtn.on('click', async () => {
+    artworkContainer.style.display = "block";
+    document.body.classList.add("modal-open");
+});
+
+// Setup next button
+const nextBtn = actionsFolder.addButton({
+    title: 'Next Artwork',
+});
+
+// Event listener for next button click, advance index, reset revealed state, and rerender
+nextBtn.on('click', async () => {
+    const artworkData = await fetchArtworksAndCache();
+    if (currentIndex < (artworkData.length - 1)) {
+        currentIndex++;
+    } else {
+        currentIndex = 0;
+    }
+    setIsRevealed(false);
+    overlay.style.display = "flex";
+    renderArtworkData();
+});
+
+// Setup reset button
+const resetBtn = actionsFolder.addButton({
+    title: 'Reset Colors',
+});
+
+// Event listener for reset colors button
+resetBtn.on('click', async () => {
+    PARAMS.charColorMode = "sampled";
+    PARAMS.cellColorMode = "fixed";
+    renderImage(imageUrl, characters, PARAMS.charColorMode, PARAMS.cellColorMode);
+    pane.refresh();
+});
 
 /**
  * Set CSS for imageContainer and artworkText 
@@ -266,25 +405,6 @@ function setIsRevealed(revealed) {
     }
 }
 
-// Next button onClick listener, advance index and reset revealed state
-document.getElementById('next-btn').addEventListener('click', async () => {
-    const artworkData = await fetchArtworksAndCache();
-    if (currentIndex < (artworkData.length - 1)) {
-        currentIndex++;
-    } else {
-        currentIndex = 0;
-    }
-    setIsRevealed(false);
-    overlay.style.display = "flex";
-    renderArtworkData();
-});
-
-// Toggle color mode button onClick listener, rerender image with new color mode
-document.getElementById('color-btn').addEventListener('click', async () => {
-    charColorFixed = !charColorFixed;
-    renderImage(imageUrl, characters, getCharColorMode(), "fixed");
-});
-
 // Overlay onClick listener, update revealed state to true
 overlay.addEventListener('click', async () => {
     setIsRevealed(true);
@@ -292,12 +412,6 @@ overlay.addEventListener('click', async () => {
 });
 
 // Mobile event listeners
-
-// Reveal button onClick listener, opens artwork sheet
-revealButton.addEventListener('click', async () => {
-    artworkContainer.style.display = "block";
-    document.body.classList.add("modal-open");
-});
 
 // Sheet scrim onClick listener, closes sheet
 artworkContainer.addEventListener('click', async () => {
@@ -315,3 +429,5 @@ document.getElementById('sheet-close').addEventListener('click', async () => {
 document.getElementById('artwork-wrapper').addEventListener('click', async (event) => {
     event.stopPropagation();
 });
+
+setTimeout(function(){renderImage(imageUrl, characters, PARAMS.charColorMode, PARAMS.cellColorMode)}, 1500);

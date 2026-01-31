@@ -1,8 +1,13 @@
+:root {
+    --tp-base-background-color: #161616;
+    --tp-container-background-color: #161616;
+}
+
 body {
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: 2fr 3fr;
+    grid-template-columns: 4fr 8fr;
     background-color: #000000;
     color: #E6E6E3;
     height: 100vh;
@@ -11,7 +16,7 @@ body {
 }
 
 #col-artwork {
-    padding: 2rem 3rem;
+    padding: 2rem;
     background-color: #161616;
     display: flex;
     flex-direction: column;
@@ -38,7 +43,7 @@ body {
 
 #col-canvas {
     display: flex;
-    flex-direction: column;
+    flex-direction: col;
     justify-content: center;
     align-items: center;
     gap: 2rem;
@@ -47,10 +52,30 @@ body {
     background-color: #000000;
 }
 
-canvas {
-    padding-bottom: 2rem;
+#col-canvas-body {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: start;
+    gap: 1rem;
 }
 
+#controls {
+    min-width: 18.25rem;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+.tp-pane,
+.tp-lblv, /* targets label views */
+.tp-dfwv, /* targets default value views */
+.tp-bldv, /* targets blade views */
+.tp-input, /* targets input fields */
+.tp-monitor /* targets monitor fields */
+{
+    font-family: "JetBrains Mono", monospace;
+}
 #intro {
     display: flex;
     flex-direction: column;
@@ -76,21 +101,13 @@ h1 {
 
 }
 
-.btn-container {
-    position: absolute;
-    bottom: 1.5rem;
-    display: flex;
-    gap: 1.5rem;
-}
-
-button {
-    height: 48px;
-    padding: 0 24px;
-    border: 4px solid #1e1e1e;
-    border-radius: 12px;
+.tp-btnv button {
+    height: 32px;
+    border: 4px solid #101010;
+    border-radius: 4px;
     font-family: "JetBrains Mono", monospace;
-    font-weight: 500;
-    font-size: 0.875rem;
+    font-weight: 400;
+    font-size: 0.75rem;
     color: #E6E6E3;
     background: linear-gradient(#646464, #333333);
     box-shadow: 0px 1px 1px 0px rgb(255, 255, 255, 0.5) inset,
@@ -99,22 +116,18 @@ button {
     transition: ease-out 100ms;
 }
 
-button:hover {
+.tp-btnv button:hover {
     box-shadow: 0px 1px 1px 0px rgb(255, 255, 255, 0.5) inset,
                 0px 2px 4px 0px rgb(255, 255, 255, 0.25) inset,
                 0px 2px 2px 0px rgb(255, 255, 255, 0.25) inset;
 }
 
-button:active {
+.tp-btnv button:active {
     transform: translateY(2px);
     box-shadow: 0px 1px 1px 0px rgb(0, 0, 0, 0.5) inset,
                     1px 1px 4px 0px rgb(0, 0, 0, 0.25) inset,
                     -1px -2px 2px 0px rgb(0, 0, 0, 0.25) inset,
                     -1px 6px 4px 0px rgb(0, 0, 0, 0.1) inset;
-}
-
-#reveal-btn {
-    display: none;
 }
 
 #artwork-container {
@@ -201,10 +214,6 @@ button:active {
     body.modal-open {
         overflow: hidden;
     }
-
-    #reveal-btn {
-        display: block;
-    }
     
     #col-artwork {
         width: auto;
@@ -281,12 +290,25 @@ button:active {
         padding-top: 2rem;
     }
 
+    #col-canvas-body {
+        flex-direction: column;
+        padding-bottom: 4rem;
+        gap: 2rem;
+    }
+
     #textmode-canvas {
         width: 100vw;
     }
 
     canvas {
         padding-bottom: 0;
+    }
+
+    #controls {
+        position: relative;
+        top: auto;
+        right: auto;
+        width: 100vw;
     }
 
     .btn-container {
