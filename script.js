@@ -219,7 +219,9 @@ function handleContextRestored() {
  * @param charColorVal string for char hex color value, white by default
  * @param cellColorVal string for cell hex color value, black by default
  */
-async function renderImage(imageUrl, characters, charColorMode, cellColorMode, charColorVal = "ffffff", cellColorVal = "000000") {  
+async function renderImage(imageUrl, characters, charColorMode, cellColorMode, charColorVal, cellColorVal) {  
+    console.log(`Render PARAMS => charColorMode: ${charColorMode}, cellColorMode: ${cellColorMode}`);
+
     myImage = await t.loadImage(imageUrl);
     // Image is now ready to use
 
@@ -233,7 +235,7 @@ async function renderImage(imageUrl, characters, charColorMode, cellColorMode, c
     // Control cell background color mode
     myImage.cellColorMode(cellColorMode);
 
-     // Set fixed character color (when charColorMode is "fixed")
+    // Set fixed character color (when charColorMode is "fixed")
     myImage.charColor(charColorVal);
     
     // Set fixed cell background color (when cellColorMode is "fixed")
@@ -314,6 +316,7 @@ charColorBinding.hidden = true;
 
 // Event listener for charColorBinding
 charColorBinding.on('change', (event) => {
+    console.log("char color change")
     renderImage(imageUrl, characters, PARAMS.charColorMode, PARAMS.cellColorMode, PARAMS.charColor, PARAMS.cellColor);
 });
 
@@ -385,8 +388,10 @@ const resetBtn = actionsFolder.addButton({
 // Event listener for reset colors button
 resetBtn.on('click', async () => {
     PARAMS.charColorMode = "sampled";
+    PARAMS.charColor = "#ffffff";
     PARAMS.cellColorMode = "fixed";
-    renderImage(imageUrl, characters, PARAMS.charColorMode, PARAMS.cellColorMode);
+    PARAMS.cellColor = "#000000";
+    renderImage(imageUrl, characters, PARAMS.charColorMode, PARAMS.cellColorMode, PARAMS.charColor, PARAMS.cellColor);
     pane.refresh();
 });
 
@@ -430,4 +435,4 @@ document.getElementById('artwork-wrapper').addEventListener('click', async (even
     event.stopPropagation();
 });
 
-setTimeout(function(){renderImage(imageUrl, characters, PARAMS.charColorMode, PARAMS.cellColorMode)}, 1500);
+setTimeout(function(){renderImage(imageUrl, characters, PARAMS.charColorMode, PARAMS.cellColorMode, PARAMS.charColor, PARAMS.cellColor)}, 1500);
